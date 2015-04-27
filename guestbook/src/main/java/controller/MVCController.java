@@ -3,6 +3,7 @@ package controller;
 import java.io.IOException;
 
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import DAO.*;
 import Entity.*;
@@ -37,6 +39,9 @@ public class MVCController {
 	
 	@Autowired
 	private UserDAO userDAO;
+	
+	@Autowired
+	private BoardDAO boardDAO;
 
 	@RequestMapping(value="test", method= RequestMethod.GET)
 	public String hello(HttpServletRequest req, Model model){
@@ -61,6 +66,7 @@ public class MVCController {
 	}
 	
 	
+	
 	@RequestMapping(value="signup", method= RequestMethod.POST)
 	public String signnup(Model model, 
 			@RequestParam("username") String username,
@@ -73,7 +79,33 @@ public class MVCController {
 		user.setName(name);
 		user.setAddress(address);
 		if(userDAO.insert(user)) return "index";
-		else return "signup";
+		else {
+			model.addAttribute("errorMessage", "username already regiestred");
+			return "signup";
+		}
 	}
 	
+	@RequestMapping(value="user/creatboard", method= RequestMethod.POST)
+	public String creatBoard(Model model, HttpServletRequest req,
+			@RequestParam("title") String title,
+			@RequestParam("access") String access,
+			@RequestParam("category") String category) {
+		Board board = (Board) context.getBean("board");
+		board.setTitle(title);
+		board.setAccess(access);
+		board.setCategory(category);
+		board.setUsername(req.getRemoteUser());
+		if(!(access.equals("public") || access.equals("private"))) {
+			model.addAttribute("errorMessage", "invalid access value");
+			return "error";
+		}
+		boardDAO.insert(board);
+		return "redirect:getboards";
+	}
+	@RequestMapping(value="user/getboards", method= RequestMethod.GET)
+	public String getBoard(Model model, HttpServletRequest req) {
+		List<Board> ownList = boardDAO.findOwnBoard(req.getRemoteUser());
+		model.addAttribute("ownList", ownList);
+		return "pagelist";
+	}
 }

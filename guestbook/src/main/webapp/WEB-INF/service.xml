@@ -9,6 +9,10 @@ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 		<property name="jdbcTemplate" ref="jdbcTemplate"/>
 	</bean>
 	
+	<bean id="boardDAO" class="DAOImpl.BoardDAOImpl">
+		<property name="jdbcTemplate" ref="jdbcTemplate"/>
+	</bean>
+	
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.GoogleDriver"/>

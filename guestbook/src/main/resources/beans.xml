@@ -7,4 +7,7 @@
 	<bean id = "user" class="Entity.User" scope="prototype">
 			<property name="authorities" value="ROLE_USER"/>
 	</bean>
+	
+	<bean id = "board" class="Entity.Board" scope="prototype">
+	</bean>
 </beans>
