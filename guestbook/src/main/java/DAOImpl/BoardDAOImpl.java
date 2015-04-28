@@ -61,11 +61,8 @@ public class BoardDAOImpl implements BoardDAO {
 	public Board findByID(int id) {
 		String sql = "SELECT * FROM BOARD WHERE id = ?";
 		Board board = new Board();
-		try {
-			board = (Board) jdbcTemplate.queryForObject(
+		board = (Board) jdbcTemplate.queryForObject(
 					sql, new Object[] { id }, new BoardRowMapper());
-		}
-		catch(Exception e){}
 		return board;
 	}
 

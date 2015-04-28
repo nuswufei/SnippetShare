@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import DAO.SnippetDAO;
 import Entity.Snippet;
+import RowMapper.SnippetRowMapper;
 
 public class SnippetDAOImpl implements SnippetDAO {
 	private JdbcTemplate jdbcTemplate;
@@ -40,8 +41,20 @@ public class SnippetDAOImpl implements SnippetDAO {
 	}
 	@Override
 	public boolean update(int id, Snippet snippet) {
-		// TODO Auto-generated method stub
-		return false;
+		String sql = "UPDATE SNIPPET "
+				+ "SET title = ?, tags = ?, content = ? "
+				+ "WHERE id = ?";
+		int rowAffected = jdbcTemplate.update(sql, 
+				new Object[]{snippet.getTitle(), snippet.getTags(), snippet.getContent()});
+		return rowAffected == 1;
+	}
+	@Override
+	public Snippet findByID(int id) {
+		String sql = "SELECT * FROM SNIPPET WHERE id = ?";
+		Snippet snippet = new Snippet();
+		snippet = (Snippet) jdbcTemplate.queryForObject(
+					sql, new Object[] { id }, new SnippetRowMapper());
+		return snippet;
 	}
 	
 	

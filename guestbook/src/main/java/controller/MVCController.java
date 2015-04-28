@@ -132,6 +132,26 @@ public class MVCController {
 		return "boardview";
 	}
 	
+	@RequestMapping(value="user/deleteSnippet", method= RequestMethod.POST)
+	public String deleteSnippet(Model model, HttpServletRequest req,
+			@RequestParam("id") int id) {
+		Snippet snippet = snippetDAO.findByID(id);
+		if(!snippet.getOwner().equals(req.getRemoteUser())){
+			model.addAttribute("errorMessage", "you do not have access to this board");
+			return "error";
+		}
+		else {
+			int boardID = snippet.getBoardID();
+			if(snippetDAO.deleteByID(id)) {
+				return "redirect:getboardbyid?id=" + boardID;
+			}
+			else {
+				model.addAttribute("errorMessage", "fail to delete the snippet");
+				return "error";
+			}
+		}
+	}
+	
 	@RequestMapping(value="user/creatsnippet", method= RequestMethod.POST)
 	public String creatSnippet(Model model, HttpServletRequest req,
 			@RequestParam("title") String title,

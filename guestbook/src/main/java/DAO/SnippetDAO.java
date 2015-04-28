@@ -9,4 +9,5 @@ public interface SnippetDAO {
 	public List<Snippet> findByBoard(int boardID);
 	public boolean deleteByID(int id);
 	public boolean update(int id, Snippet snippet);
+	public Snippet findByID(int id);
 }
