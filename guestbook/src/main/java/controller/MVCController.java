@@ -6,6 +6,7 @@ import java.io.IOException;
 
 
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -132,7 +133,7 @@ public class MVCController {
 		return "boardview";
 	}
 	
-	@RequestMapping(value="user/deleteSnippet", method= RequestMethod.POST)
+	@RequestMapping(value="user/deletesnippet", method= RequestMethod.POST)
 	public String deleteSnippet(Model model, HttpServletRequest req,
 			@RequestParam("id") int id) {
 		Snippet snippet = snippetDAO.findByID(id);
@@ -150,6 +151,34 @@ public class MVCController {
 				return "error";
 			}
 		}
+	}
+	
+	@RequestMapping(value="user/updatesnippet", method= RequestMethod.POST)
+	public String updateSnippet(Model model, HttpServletRequest req,
+			@RequestParam("id") int id,
+			@RequestParam("tags") String tags,
+			@RequestParam("content") String content,
+			@RequestParam("title") String title
+			) {
+		Snippet snippet = (Snippet) context.getBean("snippet");
+		snippet.setTags(tags);
+		snippet.setTitle(title);
+		snippet.setContent(content);
+		if(snippetDAO.update(id, snippet)) {
+			return "redirect:getsnippetbyid?id=" + id;
+		}
+		else {
+			model.addAttribute("errorMessage", "fail to update the snippet");
+			return "error";
+		}
+	}
+	
+	@RequestMapping(value="user/getsnippetbyid", method= RequestMethod.GET)
+	public String getSnippetByID(Model model, HttpServletRequest req,
+			@RequestParam("id") int id) {
+		Snippet snippet = snippetDAO.findByID(id);
+		model.addAttribute("snippet", snippet);
+		return "snippetview";
 	}
 	
 	@RequestMapping(value="user/creatsnippet", method= RequestMethod.POST)
