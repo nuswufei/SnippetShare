@@ -1,6 +1,9 @@
 package DAOImpl;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -30,6 +33,40 @@ public class BoardDAOImpl implements BoardDAO {
 		String sql = "SELECT * FROM BOARD where username = ?"; 
 		List<Board> boards = jdbcTemplate.query(sql, new Object[]{username}, new BoardRowMapper()); 
 		return boards;
+	}
+	@Override
+	public List<Board> findPublicBoard() {
+		String sql = "SELECT * FROM BOARD where access = ?"; 
+		List<Board> boards = jdbcTemplate.query(sql, new Object[]{"public"}, new BoardRowMapper()); 
+		return boards;
+	}
+	@Override
+	public List<Board> findPrivate(String username) {
+		String sql = "SELECT * FROM BOARD where id in "
+				+ "(SELECT boardID as id FROM ACCESS where username = ?)"; 
+		List<Board> boards = jdbcTemplate.query(sql, new Object[]{username}, new BoardRowMapper()); 
+		return boards;
+	}
+	@Override
+	public Set<Integer> findAllAvailbleBoardID(String username) {
+		List<Board> allBoard = new ArrayList<Board>();
+		allBoard.addAll(findPublicBoard());
+		allBoard.addAll(findOwnBoard(username));
+		allBoard.addAll(findPrivate(username));
+		Set<Integer> res = new HashSet<Integer>();
+		for(Board board : allBoard) res.add(board.getId());
+		return res;
+	}
+	@Override
+	public Board findByID(int id) {
+		String sql = "SELECT * FROM BOARD WHERE id = ?";
+		Board board = new Board();
+		try {
+			board = (Board) jdbcTemplate.queryForObject(
+					sql, new Object[] { id }, new BoardRowMapper());
+		}
+		catch(Exception e){}
+		return board;
 	}
 
 }

@@ -10,4 +10,7 @@
 	
 	<bean id = "board" class="Entity.Board" scope="prototype">
 	</bean>
+	
+	<bean id = "snippet" class="Entity.Snippet" scope="prototype">
+	</bean>
 </beans>

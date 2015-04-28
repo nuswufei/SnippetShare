@@ -4,6 +4,8 @@ import java.io.IOException;
 
 
 
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -28,9 +30,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.util.*;
 
 @Controller
 @RequestMapping("/*")
@@ -42,6 +45,9 @@ public class MVCController {
 	
 	@Autowired
 	private BoardDAO boardDAO;
+	
+	@Autowired
+	private SnippetDAO snippetDAO;
 
 	@RequestMapping(value="test", method= RequestMethod.GET)
 	public String hello(HttpServletRequest req, Model model){
@@ -102,10 +108,54 @@ public class MVCController {
 		boardDAO.insert(board);
 		return "redirect:getboards";
 	}
+	
 	@RequestMapping(value="user/getboards", method= RequestMethod.GET)
 	public String getBoard(Model model, HttpServletRequest req) {
 		List<Board> ownList = boardDAO.findOwnBoard(req.getRemoteUser());
 		model.addAttribute("ownList", ownList);
+		model.addAttribute("count", ownList.get(0).getTitle());//for debug. to be deleted
+		List<Board> pubList = boardDAO.findPublicBoard();
+		model.addAttribute("pubList", pubList);
+		List<Board> priList = boardDAO.findPrivate(req.getRemoteUser());
+		
+		model.addAttribute("priList", priList);
 		return "pagelist";
 	}
+	
+	@RequestMapping(value="user/getboardbyid", method= RequestMethod.GET)
+	public String getBoardByID(Model model, HttpServletRequest req,
+			@RequestParam("id") int id) {
+		Board board = boardDAO.findByID(id);
+		model.addAttribute("board", board);
+		List<Snippet> snippetList = snippetDAO.findByBoard(id);
+		model.addAttribute("snippets", snippetList.size());
+		return "boardview";
+	}
+	
+	@RequestMapping(value="user/creatsnippet", method= RequestMethod.POST)
+	public String creatSnippet(Model model, HttpServletRequest req,
+			@RequestParam("title") String title,
+			@RequestParam("tags") String tags,
+			@RequestParam("content") String content,
+			@RequestParam("boardID") int boardID) {
+		Set<Integer> availbleBoards = boardDAO.findAllAvailbleBoardID(req.getRemoteUser());
+		if(!availbleBoards.contains(boardID)) {
+			model.addAttribute("errorMessage", "you do not have access to this board");
+			return "error";
+		}
+		Snippet snippet = (Snippet) context.getBean("snippet");
+		snippet.setTitle(title);
+		snippet.setTags(tags);
+		snippet.setContent(content);
+		snippet.setBoardID(boardID);
+		snippet.setOwner(req.getRemoteUser());
+		if(snippetDAO.insert(snippet)) {
+			return "redirect:getboardbyid?id=" + boardID;
+		}
+		else {
+			model.addAttribute("errorMessage", "cannot creat thie snippet");
+			return "error";
+		}
+	}
+	
 }

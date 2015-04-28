@@ -2,14 +2,11 @@
   <body>
     <h1>pagelist</h1>
     <h2>ownlist</h2>
-    <c:if test="${not empty lists}">
- 
-		<ul>
-			<c:forEach var="listValue" items="${ownList}">
-				<li>${listValue.title}</li>
-			</c:forEach>
-		</ul>
- 
-	</c:if>
+	<c:forEach items="${ownList}" var="board">
+		<tr>
+		<td>${board.title}</td>
+		</tr>
+	</c:forEach>
+	<h1>${count}</h1>
   </body>
 </html>
