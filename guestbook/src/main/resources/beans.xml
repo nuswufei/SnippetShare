@@ -13,4 +13,7 @@
 	
 	<bean id = "snippet" class="Entity.Snippet" scope="prototype">
 	</bean>
+	
+	<bean id = "comment" class="Entity.Comment" scope="prototype">
+	</bean>
 </beans>

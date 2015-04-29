@@ -32,12 +32,14 @@ public class BoardDAOImpl implements BoardDAO {
 	public List<Board> findOwnBoard(String username) {
 		String sql = "SELECT * FROM BOARD where username = ?"; 
 		List<Board> boards = jdbcTemplate.query(sql, new Object[]{username}, new BoardRowMapper()); 
+		if(boards == null) return new ArrayList<Board>();
 		return boards;
 	}
 	@Override
 	public List<Board> findPublicBoard() {
 		String sql = "SELECT * FROM BOARD where access = ?"; 
 		List<Board> boards = jdbcTemplate.query(sql, new Object[]{"public"}, new BoardRowMapper()); 
+		if(boards == null) return new ArrayList<Board>();
 		return boards;
 	}
 	@Override
@@ -45,6 +47,7 @@ public class BoardDAOImpl implements BoardDAO {
 		String sql = "SELECT * FROM BOARD where id in "
 				+ "(SELECT boardID as id FROM ACCESS where username = ?)"; 
 		List<Board> boards = jdbcTemplate.query(sql, new Object[]{username}, new BoardRowMapper()); 
+		if(boards == null) return new ArrayList<Board>();
 		return boards;
 	}
 	@Override

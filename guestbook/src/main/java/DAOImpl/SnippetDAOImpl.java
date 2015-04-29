@@ -1,5 +1,6 @@
 package DAOImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,8 +29,11 @@ public class SnippetDAOImpl implements SnippetDAO {
 	}
 	@Override
 	public List<Snippet> findByBoard(int boardID) {
-		// TODO Auto-generated method stub
-		return null;
+		String sql = "SELECT * FROM SNIPPET WHERE boardID = ?";
+		List<Snippet> snippets = jdbcTemplate.query(
+					sql, new Object[] {boardID}, new SnippetRowMapper());
+		if(snippets == null) return new ArrayList<Snippet>();
+		return snippets;
 	}
 	@Override
 	public boolean deleteByID(int id) {
@@ -45,7 +49,7 @@ public class SnippetDAOImpl implements SnippetDAO {
 				+ "SET title = ?, tags = ?, content = ? "
 				+ "WHERE id = ?";
 		int rowAffected = jdbcTemplate.update(sql, 
-				new Object[]{snippet.getTitle(), snippet.getTags(), snippet.getContent()});
+				new Object[]{snippet.getTitle(), snippet.getTags(), snippet.getContent(), id});
 		return rowAffected == 1;
 	}
 	@Override

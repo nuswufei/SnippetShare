@@ -50,6 +50,9 @@ public class MVCController {
 	@Autowired
 	private SnippetDAO snippetDAO;
 
+	@Autowired
+	private CommentDAO commentDAO;
+	
 	@RequestMapping(value="test", method= RequestMethod.GET)
 	public String hello(HttpServletRequest req, Model model){
 		model.addAttribute("userID", req.getRemoteUser());
@@ -160,7 +163,12 @@ public class MVCController {
 			@RequestParam("content") String content,
 			@RequestParam("title") String title
 			) {
-		Snippet snippet = (Snippet) context.getBean("snippet");
+		Snippet snippet = snippetDAO.findByID(id);
+		if(!snippet.getOwner().equals(req.getRemoteUser())){
+			model.addAttribute("errorMessage", "you do not have access to this board");
+			return "error";
+		}
+		snippet = (Snippet) context.getBean("snippet");
 		snippet.setTags(tags);
 		snippet.setTitle(title);
 		snippet.setContent(content);
@@ -178,6 +186,8 @@ public class MVCController {
 			@RequestParam("id") int id) {
 		Snippet snippet = snippetDAO.findByID(id);
 		model.addAttribute("snippet", snippet);
+		List<Comment> comments = commentDAO.findBySnippetID(id);
+		model.addAttribute("comments", comments);
 		return "snippetview";
 	}
 	
@@ -206,5 +216,24 @@ public class MVCController {
 			return "error";
 		}
 	}
-	
+	@RequestMapping(value="user/creatcomment", method= RequestMethod.POST)
+	public String creatComment(Model model, HttpServletRequest req,
+			@RequestParam("content") String content,
+			@RequestParam("snippetid") int snippetID) {
+		Set<Integer> availbleBoards = boardDAO.findAllAvailbleBoardID(req.getRemoteUser());
+		Snippet snippet = snippetDAO.findByID(snippetID);
+		int boardID = snippet.getBoardID();
+		if(!availbleBoards.contains(boardID)) {
+			model.addAttribute("errorMessage", "you do not have access to this board");
+			return "error";
+		}
+		Comment comment = (Comment) context.getBean("comment");
+		comment.setContent(content);
+		comment.setSnippetID(snippetID);
+		if(commentDAO.insert(comment)) return "redirect:getsnippetbyid?id=" + snippetID;
+		else {
+			model.addAttribute("errorMessage", "cannot creat thie comment");
+			return "error";
+		}
+	}
 }
