@@ -216,6 +216,7 @@ public class MVCController {
 			return "error";
 		}
 	}
+	
 	@RequestMapping(value="user/creatcomment", method= RequestMethod.POST)
 	public String creatComment(Model model, HttpServletRequest req,
 			@RequestParam("content") String content,
@@ -236,4 +237,11 @@ public class MVCController {
 			return "error";
 		}
 	}
+	
+	@RequestMapping(value="user/requestaccess", method= RequestMethod.POST)
+	public String requestAccess(Model model, HttpServletRequest req,
+			@RequestParam("boardID") int boardID) {
+		return null;
+	}
+	
 }

@@ -16,4 +16,10 @@
 	
 	<bean id = "comment" class="Entity.Comment" scope="prototype">
 	</bean>
+	
+	<bean id = "access" class="Entity.Access" scope="prototype">
+	</bean>
+	
+	<bean id = "pending" class="Entity.Pending" scope="prototype">
+	</bean>
 </beans>

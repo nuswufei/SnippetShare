@@ -6,7 +6,6 @@ import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import DAO.CommentDAO;
-import Entity.Board;
 import Entity.Comment;
 import RowMapper.CommentRowMapper;
 
