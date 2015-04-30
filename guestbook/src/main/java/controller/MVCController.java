@@ -53,11 +53,18 @@ public class MVCController {
 	@Autowired
 	private CommentDAO commentDAO;
 	
+	@Autowired
+	private PendingDAO pendingDAO;
+	
+	@Autowired
+	private AccessDAO accessDAO;
+	
 	@RequestMapping(value="test", method= RequestMethod.GET)
 	public String hello(HttpServletRequest req, Model model){
 		model.addAttribute("userID", req.getRemoteUser());
 		return "testAuthority";
 	}
+	
 	
 	@RequestMapping(value="user/test", method= RequestMethod.GET)
 	public String helloUser(HttpServletRequest req, Model model){
@@ -76,7 +83,7 @@ public class MVCController {
 	}
 	
 	
-	
+	@Transactional(isolation = Isolation.SERIALIZABLE)
 	@RequestMapping(value="signup", method= RequestMethod.POST)
 	public String signnup(Model model, 
 			@RequestParam("username") String username,
@@ -95,6 +102,7 @@ public class MVCController {
 		}
 	}
 	
+	@Transactional
 	@RequestMapping(value="user/creatboard", method= RequestMethod.POST)
 	public String creatBoard(Model model, HttpServletRequest req,
 			@RequestParam("title") String title,
@@ -113,6 +121,7 @@ public class MVCController {
 		return "redirect:getboards";
 	}
 	
+	@Transactional(readOnly = true)
 	@RequestMapping(value="user/getboards", method= RequestMethod.GET)
 	public String getBoard(Model model, HttpServletRequest req) {
 		List<Board> ownList = boardDAO.findOwnBoard(req.getRemoteUser());
@@ -126,9 +135,15 @@ public class MVCController {
 		return "pagelist";
 	}
 	
+	@Transactional(readOnly = true)
 	@RequestMapping(value="user/getboardbyid", method= RequestMethod.GET)
 	public String getBoardByID(Model model, HttpServletRequest req,
 			@RequestParam("id") int id) {
+		Set<Integer> accessible = boardDAO.findAllAvailbleBoardID(req.getRemoteUser());
+		if(!accessible.contains(id)) {
+			model.addAttribute("errorMessage", "you do not have access to this board");
+			return "error";
+		}
 		Board board = boardDAO.findByID(id);
 		model.addAttribute("board", board);
 		List<Snippet> snippetList = snippetDAO.findByBoard(id);
@@ -136,6 +151,7 @@ public class MVCController {
 		return "boardview";
 	}
 	
+	@Transactional
 	@RequestMapping(value="user/deletesnippet", method= RequestMethod.POST)
 	public String deleteSnippet(Model model, HttpServletRequest req,
 			@RequestParam("id") int id) {
@@ -156,6 +172,7 @@ public class MVCController {
 		}
 	}
 	
+	@Transactional
 	@RequestMapping(value="user/updatesnippet", method= RequestMethod.POST)
 	public String updateSnippet(Model model, HttpServletRequest req,
 			@RequestParam("id") int id,
@@ -181,6 +198,7 @@ public class MVCController {
 		}
 	}
 	
+	@Transactional(readOnly = true)
 	@RequestMapping(value="user/getsnippetbyid", method= RequestMethod.GET)
 	public String getSnippetByID(Model model, HttpServletRequest req,
 			@RequestParam("id") int id) {
@@ -191,6 +209,7 @@ public class MVCController {
 		return "snippetview";
 	}
 	
+	@Transactional
 	@RequestMapping(value="user/creatsnippet", method= RequestMethod.POST)
 	public String creatSnippet(Model model, HttpServletRequest req,
 			@RequestParam("title") String title,
@@ -217,6 +236,7 @@ public class MVCController {
 		}
 	}
 	
+	@Transactional
 	@RequestMapping(value="user/creatcomment", method= RequestMethod.POST)
 	public String creatComment(Model model, HttpServletRequest req,
 			@RequestParam("content") String content,
@@ -231,6 +251,7 @@ public class MVCController {
 		Comment comment = (Comment) context.getBean("comment");
 		comment.setContent(content);
 		comment.setSnippetID(snippetID);
+		comment.setUsername(req.getRemoteUser());
 		if(commentDAO.insert(comment)) return "redirect:getsnippetbyid?id=" + snippetID;
 		else {
 			model.addAttribute("errorMessage", "cannot creat thie comment");
@@ -238,10 +259,63 @@ public class MVCController {
 		}
 	}
 	
+	@Transactional
 	@RequestMapping(value="user/requestaccess", method= RequestMethod.POST)
 	public String requestAccess(Model model, HttpServletRequest req,
 			@RequestParam("boardID") int boardID) {
-		return null;
+		String username = req.getRemoteUser();
+		Set<Integer> availbleBoards = boardDAO.findAllAvailbleBoardID(username);
+		if(availbleBoards.contains(boardID)) {
+			model.addAttribute("errorMessage", "you already have the access");
+			return "error";
+		}
+		Pending pending = (Pending) context.getBean("pending");
+		pending.setUsername(username);
+		pending.setBoardID(boardID);
+		if(pendingDAO.insert(pending)) {
+			return "accessrequestsubmissionconfirm";
+		}
+		else {
+			model.addAttribute("errorMessage", "fail to submit the request");
+			return "error";
+		}
 	}
 	
+	@RequestMapping(value="user/pending", method= RequestMethod.GET)
+	public String requestAccess(Model model, HttpServletRequest req) {
+		String username = req.getRemoteUser();
+		List<Board> boards = boardDAO.findOwnBoard(username);
+		List<Pending> pendings = new ArrayList<Pending>();
+		for(Board board:boards) {
+			pendings.addAll(pendingDAO.findByBoardID(board.getId()));
+		}
+		model.addAttribute("pendings", pendings);
+		return "pendings";
+	}
+	
+	@RequestMapping(value="user/approveaccess", method= RequestMethod.POST)
+	public String approveAccess(Model model, HttpServletRequest req, 
+			@RequestParam("username") String username,
+			@RequestParam("boardID") int boardID) {
+		String ownername = req.getRemoteUser();
+		Set<Integer> ownBoardID = new HashSet<Integer>();
+		List<Board> ownBoard = boardDAO.findOwnBoard(ownername);
+		for(Board board : ownBoard) ownBoardID.add(board.getId());
+		if(!ownBoardID.contains(boardID)) {
+			model.addAttribute("errorMessage", "you cannot approve access to this board");
+			return "error";
+		}
+		Pending pending = (Pending) context.getBean("pending");
+		Access access = (Access) context.getBean("access");
+		pending.setBoardID(boardID);
+		pending.setUsername(username);
+		access.setBoardID(boardID);
+		access.setUsername(username);
+		if(!accessDAO.insert(access)) {
+			model.addAttribute("errorMessage", "error happened during approvement");
+			return "error";
+		}
+		pendingDAO.delete(pending);
+		return "redirect:pending";
+	}
 }

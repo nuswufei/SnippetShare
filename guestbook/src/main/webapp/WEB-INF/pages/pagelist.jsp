@@ -1,7 +1,7 @@
 <html>
   <body>
     <h1>pagelist</h1>
-    <h2>ownlist</h2>
+    <h1>ownlist</h1>
 	<c:forEach items="${ownList}" var="board">
 		<tr>
 		<td>${board.title}</td>

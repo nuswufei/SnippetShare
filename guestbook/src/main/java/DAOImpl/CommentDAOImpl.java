@@ -21,10 +21,10 @@ public class CommentDAOImpl implements CommentDAO{
 	@Override
 	public boolean insert(Comment comment) {
 		String sql = "INSERT IGNORE INTO COMMENT "
-				+ "(content, snippetID)"
-				+ "VALUES (?, ?)";
+				+ "(content, snippetID, username)"
+				+ "VALUES (?, ?, ?)";
 	int rowAffected = jdbcTemplate.update(sql, 
-		new Object[]{comment.getContent(), comment.getSnippetID()});
+		new Object[]{comment.getContent(), comment.getSnippetID(), comment.getUsername()});
 		return rowAffected == 1;
 	}
 
