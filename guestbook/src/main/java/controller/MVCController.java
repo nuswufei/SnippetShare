@@ -82,12 +82,22 @@ public class MVCController {
 	}
 	
 
-
+	@Transactional
 	@RequestMapping(value="index", method= RequestMethod.GET)
 	public String getIndex(Model model, HttpServletRequest req) {
-		String name = "";
-		if((name = req.getRemoteUser()) != null){
-			model.addAttribute("currentUser", name);
+		String username = req.getRemoteUser();
+		if(username != null){
+			
+			List<Board> ownBoards = boardDAO.findOwnBoard(username);
+			model.addAttribute("ownBoards", ownBoards);
+			
+			List<Comment> ownComments = commentDAO.findByUsername(username);
+			model.addAttribute("ownComments", ownComments);
+			
+			List<Snippet> ownSnippets = snippetDAO.findByUsername(username);
+			model.addAttribute("ownSnippets", ownSnippets);
+			
+			model.addAttribute("currentUser", username);
 		}else{
 			model.addAttribute("currentUser","");
 		}
@@ -137,13 +147,12 @@ public class MVCController {
 	@RequestMapping(value="user/getboards", method= RequestMethod.GET)
 	public String getBoard(Model model, HttpServletRequest req) {
 		List<Board> ownList = boardDAO.findOwnBoard(req.getRemoteUser());
-		model.addAttribute("ownList", ownList);
-		model.addAttribute("count", ownList.get(0).getTitle());//for debug. to be deleted
+		model.addAttribute("ownList", ownList); //boards created by user
 		List<Board> pubList = boardDAO.findPublicBoard();
-		model.addAttribute("pubList", pubList);
-		List<Board> priList = boardDAO.findPrivate(req.getRemoteUser());
+		model.addAttribute("pubList", pubList); //public boards
+		List<Board> priList = boardDAO.findPrivate(req.getRemoteUser()); 
 		
-		model.addAttribute("priList", priList);
+		model.addAttribute("priList", priList);//private boards which user has access
 		return "pagelist";
 	}
 	
@@ -157,9 +166,9 @@ public class MVCController {
 			return "error";
 		}
 		Board board = boardDAO.findByID(id);
-		model.addAttribute("board", board);
+		model.addAttribute("board", board); // board information
 		List<Snippet> snippetList = snippetDAO.findByBoard(id);
-		model.addAttribute("snippets", snippetList.size());
+		model.addAttribute("snippets", snippetList.size()); //snippets in the board
 		return "boardview";
 	}
 	
@@ -293,6 +302,7 @@ public class MVCController {
 		}
 	}
 	
+	@Transactional
 	@RequestMapping(value="user/pending", method= RequestMethod.GET)
 	public String requestAccess(Model model, HttpServletRequest req) {
 		String username = req.getRemoteUser();
@@ -305,6 +315,7 @@ public class MVCController {
 		return "pendings";
 	}
 	
+	@Transactional
 	@RequestMapping(value="user/approveaccess", method= RequestMethod.POST)
 	public String approveAccess(Model model, HttpServletRequest req, 
 			@RequestParam("username") String username,
@@ -330,4 +341,25 @@ public class MVCController {
 		pendingDAO.delete(pending);
 		return "redirect:pending";
 	}
+	
+	@Transactional
+	@RequestMapping(value="user/rejectaccess", method= RequestMethod.POST)
+	public String rejectAccess(Model model, HttpServletRequest req, 
+			@RequestParam("username") String username,
+			@RequestParam("boardID") int boardID) {
+		String ownername = req.getRemoteUser();
+		Set<Integer> ownBoardID = new HashSet<Integer>();
+		List<Board> ownBoard = boardDAO.findOwnBoard(ownername);
+		for(Board board : ownBoard) ownBoardID.add(board.getId());
+		if(!ownBoardID.contains(boardID)) {
+			model.addAttribute("errorMessage", "you cannot reject access to this board");
+			return "error";
+		}
+		Pending pending = (Pending) context.getBean("pending");
+		pending.setBoardID(boardID);
+		pending.setUsername(username);
+		pendingDAO.delete(pending);
+		return "redirect:pending";
+	}
+	
 }
