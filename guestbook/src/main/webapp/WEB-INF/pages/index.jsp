@@ -77,10 +77,6 @@
 
     <div class="container">
 
-      <!-- Navs
-      ================================================== -->
-      <div class="bs-docs-section">
-
         <div class="row">
           <div class="col-lg-12">
             <div class="page-header">

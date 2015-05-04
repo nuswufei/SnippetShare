@@ -254,7 +254,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">close</button>
-                <h2 class="text-center"><img src="assets/images/login.jpg" class="img-circle"><br>Login</h2>
+                <h2 class="text-center">Login</h2>
             </div>
 
             <div class="modal-body row">
@@ -293,7 +293,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">close</button>
-                <h2 class="text-center"><img src="assets/images/signup.jpg" class="img-circle"><br>SignUp</h2>
+                <h2 class="text-center">SignUp</h2>
             </div>
 
             <div class="modal-body row">
