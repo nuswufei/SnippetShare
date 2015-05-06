@@ -240,7 +240,7 @@ public class MVCController {
 		snippet.setTitle(title);
 		snippet.setContent(content);
 		if(snippetDAO.update(id, snippet)) {
-			return "redirect:getsnippetbyid?id=" + id;
+			return "redirect:http://arboreal-harbor-92603.appspot.com/index";
 		}
 		else {
 			model.addAttribute("errorMessage", "fail to update the snippet");

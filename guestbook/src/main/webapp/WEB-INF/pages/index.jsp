@@ -306,7 +306,7 @@
                         <br>
                         <div class="row">
                           <div class="col-md-2">
-                            <button class="btn btn-lg btn-success" onclick="createsnippet()">Create</button>
+                            <button class="btn btn-md btn-success" onclick="createsnippet()">Create</button>
                           </div>
                         </div>
                      
@@ -344,7 +344,7 @@
                         <br>
                         <div class="row">
                           <div class="col-md-2">
-                            <input type="submit" value="Create" type="button" class="btn btn-lg btn-success" onclick="createboard()">
+                            <input type="submit" value="Create" type="button" class="btn btn-md btn-success" onclick="createboard()">
                           </div>
                         </div>
 
