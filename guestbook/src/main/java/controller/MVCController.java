@@ -77,11 +77,10 @@ public class MVCController {
 		if(req.getRemoteUser() != null){
 			return "redirect:index";
 		}else{
-			return "redirect:login";
+			return "login";
 		}
 	}
 	
-
 	@Transactional
 	@RequestMapping(value="index", method= RequestMethod.GET)
 	public String getIndex(Model model, HttpServletRequest req) {
@@ -303,7 +302,7 @@ public class MVCController {
 		comment.setContent(content);
 		comment.setSnippetID(snippetID);
 		comment.setUsername(req.getRemoteUser());
-		if(commentDAO.insert(comment)) return "redirect:getsnippetbyid?id=" + snippetID;
+		if(commentDAO.insert(comment)) return "redirect:http://arboreal-harbor-92603.appspot.com/index";
 		else {
 			model.addAttribute("errorMessage", "cannot creat thie comment");
 			return "error";
@@ -324,7 +323,7 @@ public class MVCController {
 		pending.setUsername(username);
 		pending.setBoardID(boardID);
 		if(pendingDAO.insert(pending)) {
-			return "accessrequestsubmissionconfirm";
+			return "redirect:http://arboreal-harbor-92603.appspot.com/index";
 		}
 		else {
 			model.addAttribute("errorMessage", "fail to submit the request");
@@ -346,7 +345,7 @@ public class MVCController {
 	}
 	
 	@Transactional
-	@RequestMapping(value="user/approveaccess", method= RequestMethod.POST)
+	@RequestMapping(value="/approveaccess", method= RequestMethod.POST)
 	public String approveAccess(Model model, HttpServletRequest req, 
 			@RequestParam("username") String username,
 			@RequestParam("boardID") int boardID) {
@@ -369,11 +368,11 @@ public class MVCController {
 			return "error";
 		}
 		pendingDAO.delete(pending);
-		return "redirect:pending";
+		return "redirect:http://arboreal-harbor-92603.appspot.com/user/pending";
 	}
 	
 	@Transactional
-	@RequestMapping(value="user/rejectaccess", method= RequestMethod.POST)
+	@RequestMapping(value="/rejectaccess", method= RequestMethod.POST)
 	public String rejectAccess(Model model, HttpServletRequest req, 
 			@RequestParam("username") String username,
 			@RequestParam("boardID") int boardID) {
@@ -389,7 +388,7 @@ public class MVCController {
 		pending.setBoardID(boardID);
 		pending.setUsername(username);
 		pendingDAO.delete(pending);
-		return "redirect:pending";
+		return "redirect:http://arboreal-harbor-92603.appspot.com/user/pending";
 	}
 	
 }

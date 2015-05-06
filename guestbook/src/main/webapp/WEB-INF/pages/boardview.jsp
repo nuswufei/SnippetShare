@@ -99,6 +99,29 @@
         myform.submit();
         document.body.removeChild(myform);
       }
+      function createcomment(content, id){
+      	var x = document.getElementById(content + 'text').value;
+
+      	var myform = document.createElement("form");
+        myform.action = "user/creatcomment";
+        myform.method = "post";
+        
+        var content = document.createElement("input");
+        content.value = x;
+        content.name = "content";
+
+        var snippetid = document.createElement("input");
+        snippetid.value = id;
+        snippetid.name = "snippetid";
+
+        myform.appendChild(content);
+        myform.appendChild(snippetid);
+
+        document.body.appendChild(myform);
+        myform.submit();
+        document.body.removeChild(myform);
+
+      }
     </script>
   </head>
   <body>
@@ -160,6 +183,17 @@
                               <div class="modal-footer">
                                 <button type="button" id="deletebtn" value="${s.id}" class="btn btn-default" data-dismiss="modal" onclick="deleteaction(this)">Delete</button>
                                 <button type="button" class="btn btn-primary">Edit</button>
+                                <a class="btn btn-primary"a href="user/getsnippetbyid?id=${s.id}">ShowComments</a>
+                              </div>
+                              <div class="modal-footer">
+		                          <label for="textArea" class="col-lg-2 control-label">Comment</label>
+		                          <div class="col-lg-10">
+		                            <textarea class="form-control" rows="3" id="${s.title}text"></textarea>
+		                          </div>
+		                          <br>	                          
+                              </div>
+                              <div class="modal-footer">
+                              		<button type="button" class="btn btn-success" onclick="createcomment('${s.title}','${s.id}')">Add Comment</button>	
                               </div>
                             </div>
                           </div>
@@ -254,6 +288,7 @@
 	        </div>
 	      </div>
 	    </div>
+	    <a class="btn btn-success" href="http://arboreal-harbor-92603.appspot.com/index">Back</a>
 
       <footer>
         <div class="row">

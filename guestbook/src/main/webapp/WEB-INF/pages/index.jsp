@@ -100,6 +100,19 @@
         document.body.removeChild(myform);
         
       }
+
+      function requestaccess(id){
+        var myform = document.createElement("form");
+        myform.action = "user/requestaccess";
+        myform.method = "post";
+        var boardID= document.createElement("input");
+        boardID.value = id;
+        boardID.name = "boardID";
+        myform.appendChild(boardID);
+        document.body.appendChild(myform);
+        myform.submit();
+        document.body.removeChild(myform);
+      }
     </script>
   </head>
   <body>
@@ -142,16 +155,6 @@
                 <li class="active"><a href="#snippetlist" data-toggle="tab">Board List</a></li>
                 <li><a href="http://arboreal-harbor-92603.appspot.com/index#newsnippet" data-toggle="tab">New Snippet</a></li>
                 <li><a href="http://arboreal-harbor-92603.appspot.com/index#newboard" data-toggle="tab">New Board</a></li>
-                <li class="dropdown">
-                  <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                    Dropdown <span class="caret"></span>
-                  </a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#dropdown1" data-toggle="tab">Action</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#dropdown2" data-toggle="tab">Another Action</a></li>
-                  </ul>
-                </li>
               </ul>
               <div id="myTabContent" class="tab-content">
                 <div class="tab-pane fade active in" id="snippetlist">                
@@ -235,10 +238,28 @@
                         <div class="modal-header">
                           <h4 class="modal-title">Unavailable Private Boards</h4>
                         </div>
-                        <div class="modal-body">
-                          <c:forEach items="${unavailablePrivateBoards}" var="s">  
-                            <p><a href="getboardbyid?id=${s.id}">${s.title}</a></p>
-                          </c:forEach>
+                        <c:forEach items="${unavailablePrivateBoards}" var="s">  
+                          <div class="modal-body">
+                              <p><a href="getboardbyid?id=${s.id}">${s.title}</a></p>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-success" onclick="requestaccess('${s.id}')">Request Access</button>
+                          </div>
+                        </c:forEach>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bs-component">
+                  <div class="modal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">Check Pending Request</h4>
+                        </div>
+                        <div class="modal-body">  
+                          <p><a href="user/pending">Pending Manage</a></p>                       
                         </div>
                       </div>
                     </div>
@@ -339,7 +360,7 @@
                 <br>
                 <br>
                 <c:forEach items="${allUsername}" var="s">                       
-                  <p><a href="">${s}</a></p>
+                  <p>${s}</p>
                 </c:forEach>
           </div>
         </div>

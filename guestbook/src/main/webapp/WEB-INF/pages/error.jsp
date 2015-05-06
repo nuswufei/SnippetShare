@@ -24,6 +24,7 @@
                 <h4>Error!</h4>
                 <p>${errorMessage}</p>
               </div>
+              <a class="btn btn-success" href="http://arboreal-harbor-92603.appspot.com/index">Back</a>
             </div>
           </div>
         </div>
