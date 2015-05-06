@@ -1,3 +1,4 @@
+
 package DAO;
 
 import java.util.*;
@@ -11,4 +12,5 @@ public interface BoardDAO {
 	public List<Board> findPublicBoard();
 	public List<Board> findPrivate(String username);
 	public Set<Integer> findAllAvailbleBoardID(String username);
+	public List<Board> findUnavailable(String username);
 }

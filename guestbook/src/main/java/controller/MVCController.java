@@ -75,9 +75,9 @@ public class MVCController {
 	@RequestMapping(value="/", method= RequestMethod.GET)
 	public String getHomepage(HttpServletRequest req) {
 		if(req.getRemoteUser() != null){
-			return "index";
+			return "redirect:index";
 		}else{
-			return "login";
+			return "redirect:login";
 		}
 	}
 	
@@ -91,16 +91,20 @@ public class MVCController {
 			List<Board> ownBoards = boardDAO.findOwnBoard(username);
 			model.addAttribute("ownBoards", ownBoards);
 			
-			List<Comment> ownComments = commentDAO.findByUsername(username);
-			model.addAttribute("ownComments", ownComments);
+			List<Board> publicBoards = boardDAO.findPublicBoard();
+			model.addAttribute("publicBoards", publicBoards);
 			
-			List<Snippet> ownSnippets = snippetDAO.findByUsername(username);
-			model.addAttribute("ownSnippets", ownSnippets);
-
-			/*List<User> users = userDAO.findAll();
+			List<Board> availablePrivateBoards = boardDAO.findPrivate(username);
+			model.addAttribute("availablePrivateBoards", availablePrivateBoards);
+			
+			List<Board> unavailablePrivateBoards = boardDAO.findUnavailable(username);
+			model.addAttribute("unavailablePrivateBoards", unavailablePrivateBoards);
+			
+			List<User> users = userDAO.findAll();
 			List<String> allUsername = new ArrayList<String>();
 			for(User user : users) allUsername.add(user.getUsername());
-			model.addAttribute("allUsername", allUsername);*/
+			model.addAttribute("allUsername", allUsername);
+			
 
 			model.addAttribute("currentUser", username);
 		}else{
@@ -109,6 +113,16 @@ public class MVCController {
 		return "index";
 	}
 	
+	@RequestMapping(value="testUsers", method = RequestMethod.GET) 
+	public String getAllUsers(Model model){
+		List<User> users = userDAO.findAll();
+		
+		model.addAttribute("userscount", users.size());
+		List<String> allUsername = new ArrayList<String>();
+		for(User user : users) allUsername.add(user.getUsername());
+		model.addAttribute("firstuser", allUsername.get(0));
+		return "testusers";
+	}
 	
 	@Transactional(isolation = Isolation.SERIALIZABLE)
 	@RequestMapping(value="signup", method= RequestMethod.POST)
@@ -130,7 +144,7 @@ public class MVCController {
 	}
 	
 	@Transactional
-	@RequestMapping(value="user/creatboard", method= RequestMethod.POST)
+	@RequestMapping(value="user/createboard", method= RequestMethod.POST)
 	public String creatBoard(Model model, HttpServletRequest req,
 			@RequestParam("title") String title,
 			@RequestParam("access") String access,
@@ -162,9 +176,19 @@ public class MVCController {
 	}
 	
 	@Transactional(readOnly = true)
-	@RequestMapping(value="user/getboardbyid", method= RequestMethod.GET)
+	@RequestMapping(value="getboardbyid", method= RequestMethod.GET)
 	public String getBoardByID(Model model, HttpServletRequest req,
 			@RequestParam("id") int id) {
+		String username = req.getRemoteUser();
+		if(username != null){
+			
+			List<Board> ownBoards = boardDAO.findOwnBoard(username);
+			model.addAttribute("ownBoards", ownBoards);		
+			model.addAttribute("currentUser", username);
+		}else{
+			model.addAttribute("currentUser","");
+		}
+
 		Set<Integer> accessible = boardDAO.findAllAvailbleBoardID(req.getRemoteUser());
 		if(!accessible.contains(id)) {
 			model.addAttribute("errorMessage", "you do not have access to this board");
@@ -173,7 +197,7 @@ public class MVCController {
 		Board board = boardDAO.findByID(id);
 		model.addAttribute("board", board); // board information
 		List<Snippet> snippetList = snippetDAO.findByBoard(id);
-		model.addAttribute("snippets", snippetList.size()); //snippets in the board
+		model.addAttribute("snippets", snippetList); //snippets in the board
 		return "boardview";
 	}
 	

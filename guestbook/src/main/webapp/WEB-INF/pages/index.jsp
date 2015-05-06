@@ -63,8 +63,26 @@
 
       function createboard(){
         var myform = document.createElement("form");
-        myform.action = "user/deletesnippet";
+        myform.action = "user/createboard";
         myform.method = "post";
+
+        var title = document.createElement("input");
+        title.value = document.getElementById("boardtitle").value;
+        title.name = "title";
+        var access = document.createElement("input");
+        access.value = document.getElementById("boardaccess").value;
+        access.name = "access";
+        var categpry = document.createElement("input");
+        categpry.value = document.getElementById("boardcategory").value;
+        categpry.name = "category";
+
+        myform.appendChild(title);
+        myform.appendChild(access);
+        myform.appendChild(categpry);
+
+        document.body.appendChild(myform);
+        myform.submit();
+        document.body.removeChild(myform);
       }
 
       function deleteaction(elem){
@@ -88,7 +106,7 @@
     <div class="navbar navbar-default navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
-          <a href="../" class="navbar-brand">SnippetShare</a>
+          <a href="../" class="navbar-brand"><font color="#f44d3c">SnippetShare</font></a>
           <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
@@ -98,30 +116,7 @@
         <div class="navbar-collapse collapse" id="navbar-main">
           <ul class="nav navbar-nav">
             <ul class="nav navbar-nav">
-              <li><a href="#">Snippet</a></li>
-                <ul class="dropdown-menu" role="menu">
-                  <li><a href="/create">Create</a></li>
-                  <li><a href="#">Another action</a></li>
-                  <li><a href="#">Something else here</a></li>
-                  <li class="divider"></li>
-                  <li class="dropdown-header">Nav header</li>
-                  <li><a href="#">Separated link</a></li>
-                  <li><a href="#">One more separated link</a></li>
-                </ul>
-              <li><a href="#">Group</a></li>
-              <li><a href="#contact">Contact</a></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
-                  <li><a href="#">Action</a></li>
-                  <li><a href="#">Another action</a></li>
-                  <li><a href="#">Something else here</a></li>
-                  <li class="divider"></li>
-                  <li class="dropdown-header">Nav header</li>
-                  <li><a href="#">Separated link</a></li>
-                  <li><a href="#">One more separated link</a></li>
-                </ul>
-              </li>
+              
             </ul>
           </ul>
 
@@ -144,9 +139,9 @@
             <h2 id="nav-tabs">Snippets</h2>
             <div class="bs-component">
               <ul class="nav nav-tabs">
-                <li class="active"><a href="#snippetlist" data-toggle="tab">Snippet List</a></li>
-                <li><a href="#newsnippet" data-toggle="tab">New Snippet</a></li>
-                <li><a href="#newboard" data-toggle="tab">New Board</a></li>
+                <li class="active"><a href="#snippetlist" data-toggle="tab">Board List</a></li>
+                <li><a href="http://arboreal-harbor-92603.appspot.com/index#newsnippet" data-toggle="tab">New Snippet</a></li>
+                <li><a href="http://arboreal-harbor-92603.appspot.com/index#newboard" data-toggle="tab">New Board</a></li>
                 <li class="dropdown">
                   <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                     Dropdown <span class="caret"></span>
@@ -160,7 +155,7 @@
               </ul>
               <div id="myTabContent" class="tab-content">
                 <div class="tab-pane fade active in" id="snippetlist">                
-                    <c:forEach items="${ownSnippets}" var="s">                       
+                    <!--<c:forEach items="${ownSnippets}" var="s">                       
                       <div class="bs-component">
                         <div class="modal">
                           <div class="modal-dialog">
@@ -180,7 +175,76 @@
                           </div>
                         </div>
                       </div>
-                    </c:forEach>
+                    </c:forEach> -->
+                                         
+                <div class="bs-component">
+                  <div class="modal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">Own Boards</h4>
+                        </div>
+                        <div class="modal-body">
+                          <c:forEach items="${ownBoards}" var="s">  
+                            <p><a href="getboardbyid?id=${s.id}">${s.title}</a></p>
+                          </c:forEach>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bs-component">
+                  <div class="modal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">Public Boards</h4>
+                        </div>
+                        <div class="modal-body">
+                          <c:forEach items="${publicBoards}" var="s">  
+                            <p><a href="getboardbyid?id=${s.id}">${s.title}</a></p>
+                          </c:forEach>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                 
+                <div class="bs-component">
+                  <div class="modal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">Available Private Boards</h4>
+                        </div>
+                        <div class="modal-body">
+                          <c:forEach items="${availablePrivateBoards}" var="s">  
+                            <p><a href="getboardbyid?id=${s.id}">${s.title}</a></p>
+                          </c:forEach>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="bs-component">
+                  <div class="modal">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h4 class="modal-title">Unavailable Private Boards</h4>
+                        </div>
+                        <div class="modal-body">
+                          <c:forEach items="${unavailablePrivateBoards}" var="s">  
+                            <p><a href="getboardbyid?id=${s.id}">${s.title}</a></p>
+                          </c:forEach>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
                 </div>
                 <div class="tab-pane fade" id="newsnippet">
                     <div class="col-lg-10">
@@ -209,7 +273,11 @@
                         <div class="form-group">
                           <label for="inputID" class="col-lg-2 control-label">BoardID</label>
                           <div class="col-lg-10">
-                            <input type="text" class="form-control" id="snippetboard" name="boardID">
+                            <select class="form-control" id="snippetboard">
+                              <c:forEach items="${ownBoards}" var="s">
+                                <option value=${s.id}><label>${s.title}</label></option>
+                              </c:forEach>                              
+                            </select>
                           </div>
                         </div>
                         <br>
@@ -237,7 +305,10 @@
                         <div class="form-group">
                           <label for="inputTags" class="col-lg-2 control-label">Access</label>
                           <div class="col-lg-10">
-                            <input type="text" class="form-control" id="boardaccess" name="tags">
+                            <select class="form-control" id="boardaccess">
+                              <option value="public"><label>public</label></option>
+                              <option value="private"><label>private</label></option>
+                            </select>
                           </div>
                         </div>
 
@@ -247,7 +318,8 @@
                             <input type="text" class="form-control" id="boardcategory" name="boardID">
                           </div>
                         </div>
-                        
+                        <br>
+                        <br>
                         <br>
                         <div class="row">
                           <div class="col-md-2">
@@ -258,19 +330,17 @@
                        
                     </div>
                 </div>
-                <div class="tab-pane fade" id="dropdown1">
-                  <p>Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings gentrify squid 8-bit cred pitchfork.</p>
-                </div>
-                <div class="tab-pane fade" id="dropdown2">
-                  <p>Trust fund seitan letterpress, keytar raw denim keffiyeh etsy art party before they sold out master cleanse gluten-free squid scenester freegan cosby sweater. Fanny pack portland seitan DIY, art party locavore wolf cliche high life echo park Austin. Cred vinyl keffiyeh DIY salvia PBR, banh mi before they sold out farm-to-table VHS viral locavore cosby sweater.</p>
-                </div>
               </div>
             </div>
           </div>
           <div class="col-lg-2">
-            <h2>User List</h2>
-            <h6>Place Holder1</h6>
-            <h6>Place Holder2</h6>
+
+            <h2>Friends</h2>
+                <br>
+                <br>
+                <c:forEach items="${allUsername}" var="s">                       
+                  <p><a href="">${s}</a></p>
+                </c:forEach>
           </div>
         </div>
 
